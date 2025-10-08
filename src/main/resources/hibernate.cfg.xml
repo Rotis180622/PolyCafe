@@ -1,0 +1,37 @@
+<hibernate-configuration>
+	<session-factory>
+		<!--JDBC Driver -->
+		<property name="hibernate.connection.driver_class">
+			com.microsoft.sqlserver.jdbc.SQLServerDriver
+		</property>
+
+		<!-- Đường dẫn url -->
+		<property name="hibernate.connection.url">
+			jdbc:sqlserver://localhost:1433;databaseName=PolyCafe2;encrypt=true;trustServerCertificate=true	
+		</property>		
+
+		<!-- Tài khoản DB -->
+		<property name="hibernate.connection.username">sa</property>
+		<property name="hibernate.connection.password">123</property>
+		
+		<!-- Tự động tạo/kiểm tra bảng -->
+		<property name="hibernate.hbm2ddl.auto">update</property>
+
+		<!-- Dialect cho SQL Server -->
+		<property name="hibernate.dialect">
+		org.hibernate.dialect.SQLServerDialect
+		</property>
+
+		<!-- Other settings -->
+		<property name="hibernate.show_sql">true</property>
+		<property name="hibernate.format_sql">true</property>	
+		
+		<!-- Mapping các Entity class -->
+		<mapping class="com.poly.polycafe.entity.Categories"/>
+		<mapping class="com.poly.polycafe.entity.Drinks"/>
+		<mapping class="com.poly.polycafe.entity.Cards"/>			
+		<mapping class="com.poly.polycafe.entity.Users"/>
+		<mapping class="com.poly.polycafe.entity.Bills"/>
+		<mapping class="com.poly.polycafe.entity.BillDetails"/>			
+	</session-factory>
+</hibernate-configuration>
