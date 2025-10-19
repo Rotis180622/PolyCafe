@@ -4,11 +4,24 @@
  */
 package com.poly.polycafe.ui.manager;
 
+import com.poly.polycafe.controller.RevenueController;
+import com.poly.polycafe.daoimpl.RevenueDAOImpl;
+import com.poly.polycafe.entity.Revenue;
+import com.poly.polycafe.utils.TimeRange;
+import java.sql.Timestamp;
+import java.text.DecimalFormat;
+import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.List;
+import javax.swing.table.DefaultTableModel;
+
+
+
 /**
  *
  * @author Gaudomun
  */
-public class RevenueManagerJDialog extends javax.swing.JDialog {
+public class RevenueManagerJDialog extends javax.swing.JDialog implements RevenueController {
 
     /**
      * Creates new form RevenueManagerJDialog
@@ -28,22 +41,99 @@ public class RevenueManagerJDialog extends javax.swing.JDialog {
     private void initComponents() {
 
         pnlFilter = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        btnFilter = new javax.swing.JButton();
+        spnBegin = new javax.swing.JSpinner();
+        spnEnd = new javax.swing.JSpinner();
+        cboTimeRange = new javax.swing.JComboBox<>();
         tabs = new javax.swing.JTabbedPane();
         pnlRevenueByCats = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        tblRevByCats = new javax.swing.JTable();
+        tblRevByCat = new javax.swing.JTable();
+        jPanel2 = new javax.swing.JPanel();
+        jLabel4 = new javax.swing.JLabel();
+        txtRevenueByCat = new javax.swing.JTextField();
         pnlRevenueByEmployees = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        tblRevByEmps = new javax.swing.JTable();
+        tblRevByEmp = new javax.swing.JTable();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
+        txtRevenueByEmp = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Thống kê doanh thu");
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowOpened(java.awt.event.WindowEvent evt) {
+                formWindowOpened(evt);
+            }
+        });
 
         pnlFilter.setPreferredSize(new java.awt.Dimension(400, 30));
-        pnlFilter.setLayout(new java.awt.GridBagLayout());
+
+        jLabel1.setText("Ngày bắt đầu");
+
+        jLabel2.setText("Ngày kết thúc");
+
+        btnFilter.setText("Lọc");
+        btnFilter.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnFilterMouseClicked(evt);
+            }
+        });
+        btnFilter.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnFilterActionPerformed(evt);
+            }
+        });
+
+        spnBegin.setModel(new javax.swing.SpinnerDateModel());
+
+        spnEnd.setModel(new javax.swing.SpinnerDateModel(new java.util.Date(), null, null, java.util.Calendar.MINUTE));
+
+        cboTimeRange.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Hôm nay", "Tuần này", "Tháng này", "Quý này", "Năm nay" }));
+        cboTimeRange.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cboTimeRangeActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout pnlFilterLayout = new javax.swing.GroupLayout(pnlFilter);
+        pnlFilter.setLayout(pnlFilterLayout);
+        pnlFilterLayout.setHorizontalGroup(
+            pnlFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlFilterLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(spnBegin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(24, 24, 24)
+                .addComponent(jLabel2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(spnEnd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(cboTimeRange, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnFilter, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        pnlFilterLayout.setVerticalGroup(
+            pnlFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlFilterLayout.createSequentialGroup()
+                .addGap(9, 9, 9)
+                .addGroup(pnlFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(spnBegin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2)
+                    .addComponent(spnEnd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnFilter)
+                    .addComponent(cboTimeRange, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
         getContentPane().add(pnlFilter, java.awt.BorderLayout.PAGE_START);
 
-        tblRevByCats.setModel(new javax.swing.table.DefaultTableModel(
+        tblRevByCat.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null},
                 {null, null, null, null, null, null},
@@ -54,53 +144,111 @@ public class RevenueManagerJDialog extends javax.swing.JDialog {
                 "Loại", "Doanh thu", "Số lượng", "Giá thấp nhất", "Giá cao nhất", "Giá trung bình"
             }
         ));
-        jScrollPane1.setViewportView(tblRevByCats);
+        jScrollPane1.setViewportView(tblRevByCat);
+
+        jPanel2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 0, 51)));
+
+        jLabel4.setText("Tổng doanh thu");
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel4)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(txtRevenueByCat, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(txtRevenueByCat, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(18, Short.MAX_VALUE))
+        );
 
         javax.swing.GroupLayout pnlRevenueByCatsLayout = new javax.swing.GroupLayout(pnlRevenueByCats);
         pnlRevenueByCats.setLayout(pnlRevenueByCatsLayout);
         pnlRevenueByCatsLayout.setHorizontalGroup(
             pnlRevenueByCatsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlRevenueByCatsLayout.createSequentialGroup()
+            .addGroup(pnlRevenueByCatsLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 388, Short.MAX_VALUE)
-                .addContainerGap())
+                .addGroup(pnlRevenueByCatsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pnlRevenueByCatsLayout.setVerticalGroup(
             pnlRevenueByCatsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlRevenueByCatsLayout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 26, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 35, Short.MAX_VALUE))
         );
 
         tabs.addTab("Doanh thu theo từng loại ", pnlRevenueByCats);
 
-        tblRevByEmps.setModel(new javax.swing.table.DefaultTableModel(
+        tblRevByEmp.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null}
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
             },
             new String [] {
-                "Loại", "Nhân viên", "Doanh thu", "Số bill", "Bill đầu tiên", "Bill gần nhất"
+                "Nhân viên", "Doanh thu", "Số bill", "Bill đầu tiên", "Bill gần nhất"
             }
         ));
-        jScrollPane2.setViewportView(tblRevByEmps);
+        jScrollPane2.setViewportView(tblRevByEmp);
+
+        jPanel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 0, 51)));
+
+        jLabel3.setText("Tổng doanh thu");
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(txtRevenueByEmp, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(txtRevenueByEmp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(18, Short.MAX_VALUE))
+        );
 
         javax.swing.GroupLayout pnlRevenueByEmployeesLayout = new javax.swing.GroupLayout(pnlRevenueByEmployees);
         pnlRevenueByEmployees.setLayout(pnlRevenueByEmployeesLayout);
         pnlRevenueByEmployeesLayout.setHorizontalGroup(
             pnlRevenueByEmployeesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlRevenueByEmployeesLayout.createSequentialGroup()
+            .addGroup(pnlRevenueByEmployeesLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 388, Short.MAX_VALUE)
+                .addGroup(pnlRevenueByEmployeesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 614, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         pnlRevenueByEmployeesLayout.setVerticalGroup(
             pnlRevenueByEmployeesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlRevenueByEmployeesLayout.createSequentialGroup()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 26, Short.MAX_VALUE))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 206, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 41, Short.MAX_VALUE))
         );
 
         tabs.addTab("Doanh thu theo nhân viên", pnlRevenueByEmployees);
@@ -109,6 +257,25 @@ public class RevenueManagerJDialog extends javax.swing.JDialog {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
+        this.fillToCatTable();
+        this.fillToEmpTable();
+        this.setLocationRelativeTo(null);
+    }//GEN-LAST:event_formWindowOpened
+
+    private void cboTimeRangeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboTimeRangeActionPerformed
+        this.getTimeRange();
+    }//GEN-LAST:event_cboTimeRangeActionPerformed
+
+    private void btnFilterMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnFilterMouseClicked
+
+    }//GEN-LAST:event_btnFilterMouseClicked
+
+    private void btnFilterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFilterActionPerformed
+        TimeRange ts = this.getTimeRange();
+        this.filterByTimeRange(ts.getBegin(), ts.getEnd());
+    }//GEN-LAST:event_btnFilterActionPerformed
 
     /**
      * @param args the command line arguments
@@ -153,13 +320,157 @@ public class RevenueManagerJDialog extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnFilter;
+    private javax.swing.JComboBox<String> cboTimeRange;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JPanel pnlFilter;
     private javax.swing.JPanel pnlRevenueByCats;
     private javax.swing.JPanel pnlRevenueByEmployees;
+    private javax.swing.JSpinner spnBegin;
+    private javax.swing.JSpinner spnEnd;
     private javax.swing.JTabbedPane tabs;
-    private javax.swing.JTable tblRevByCats;
-    private javax.swing.JTable tblRevByEmps;
+    private javax.swing.JTable tblRevByCat;
+    private javax.swing.JTable tblRevByEmp;
+    private javax.swing.JTextField txtRevenueByCat;
+    private javax.swing.JTextField txtRevenueByEmp;
     // End of variables declaration//GEN-END:variables
+    private DefaultTableModel tblEmpModel;
+    private DefaultTableModel tblCatModel;
+    
+    private RevenueDAOImpl revenueDao = new RevenueDAOImpl();
+    
+    List<Revenue.ByEmp> empList = List.of();
+    List<Revenue.ByCategory> catList = List.of();
+    
+    DecimalFormat df = new DecimalFormat("#,##0.00");
+    
+    @Override
+    public void fillToEmpTable() {
+        tblEmpModel = (DefaultTableModel) tblRevByEmp.getModel();
+        tblEmpModel.setRowCount(0);
+        empList = revenueDao.revenueByEmp();
+        
+        for(Revenue.ByEmp emp : empList) {
+            Object[] rowData = {
+              emp.getEmpName(),
+                emp.getRevenue(),
+               emp.getNumOfBills(),
+               emp.getFirstBill(),
+               emp.getRecentBill()
+            };
+            tblEmpModel.addRow(rowData);
+        }
+        this.calculateSum();
+    }
+    
+    public void fillToEmpTable_EmpList(List<Revenue.ByEmp> employeeList) {
+        tblEmpModel = (DefaultTableModel) tblRevByEmp.getModel();
+        tblEmpModel.setRowCount(0);
+        empList = employeeList;
+        
+        for(Revenue.ByEmp emp : empList) {
+            Object[] rowData = {
+                emp.getEmpName(),
+                emp.getRevenue(),
+                emp.getNumOfBills(),
+                emp.getFirstBill(),
+                emp.getRecentBill()
+            };
+            tblEmpModel.addRow(rowData);
+        }
+        
+    }
+
+    @Override
+    public void fillToCatTable() {
+        tblCatModel = (DefaultTableModel) tblRevByCat.getModel();
+        tblCatModel.setRowCount(0);
+        catList = revenueDao.revenueByCategory();
+        
+        for(Revenue.ByCategory cat : catList) {
+            Object[] rowData = {
+              cat.getCategoryName(),
+                cat.getRevenue(),
+                cat.getQuantity(),
+                cat.getMinPrice(),
+                cat.getMaxPrice(),
+                cat.getAvgPrice()
+            };
+            tblCatModel.addRow(rowData);
+        }
+        this.calculateSum();
+    }
+    
+    public void fillToCatTable_CatList(List<Revenue.ByCategory> categoryList) {
+        tblCatModel = (DefaultTableModel) tblRevByCat.getModel();
+        tblCatModel.setRowCount(0);
+        catList = categoryList;
+        
+        for(Revenue.ByCategory cat : catList) {
+            Object[] rowData = {
+              cat.getCategoryName(),
+                cat.getRevenue(),
+                cat.getQuantity(),
+                cat.getMinPrice(),
+                cat.getMaxPrice(),
+                cat.getAvgPrice()
+            };
+            tblCatModel.addRow(rowData);
+        }
+    }
+    
+
+    @Override
+    public void filterByTimeRange(LocalDateTime begin, LocalDateTime end) {
+        if(tabs.getSelectedIndex() == 0) {
+            catList = revenueDao.revenueByCat_TimeRange(begin, end);
+            this.fillToCatTable_CatList(catList);
+            
+        }else if(tabs.getSelectedIndex() == 1) {
+            empList = revenueDao.revenueByEmp_TimeRange(begin, end);
+            this.fillToEmpTable_EmpList(empList);
+        }
+        this.calculateSum();
+    }
+    
+    public TimeRange getTimeRange() {
+        String selected = (String) cboTimeRange.getSelectedItem();
+        TimeRange tr = switch (selected) {
+            case "Hôm nay"   -> TimeRange.today();
+            case "Tuần này"  -> TimeRange.thisWeek();
+            case "Tháng này" -> TimeRange.thisMonth();
+            case "Quý này"   -> TimeRange.thisQuarter();
+            case "Năm nay"   -> TimeRange.thisYear();
+            default           -> null;
+        };
+
+        if (tr != null) {
+            Date beginDate = Timestamp.valueOf(tr.getBegin());
+            Date endDate = Timestamp.valueOf(tr.getEnd());
+
+            spnBegin.setValue(beginDate);
+            spnEnd.setValue(endDate);
+        } else {
+            System.err.println("[WARN] Không có khoảng thời gian hợp lệ được chọn!");
+        }
+
+        return tr;
+    }
+
+    @Override
+    public void calculateSum() {
+        double sum = 0;
+        for(int i=0; i<tblRevByCat.getRowCount(); i++) {
+            sum += (Double)tblRevByCat.getValueAt(i, 1);
+        }
+        txtRevenueByCat.setText(df.format(sum));
+        txtRevenueByEmp.setText(df.format(sum));
+    }
 }

@@ -8,6 +8,7 @@ import java.util.prefs.Preferences;
 import javax.swing.JOptionPane;
 import com.poly.polycafe.daoimpl.UserDAOImpl;
 import com.poly.polycafe.entity.User;
+import java.awt.Frame;
 import java.util.List;
 import javax.swing.JFrame;
 /**
@@ -287,10 +288,15 @@ public class LoginJDialog extends javax.swing.JDialog {
         for (User item : users) {
             if (user.equals(item.getUsername()) && pass.equals(item.getPassword())) {
                 found = true;
-
+                
+                HistoryJDialog hDialog = new HistoryJDialog((Frame)this.getParent(), true);
+                hDialog.setUsername(item.getUsername());
+                
                 JFrame frame;
                 if (item.isManager()) {
                     frame = new ManagerJFrame();
+                    ((ManagerJFrame) frame).setHistoryDialog(hDialog);
+                    ((ManagerJFrame) frame).setUser(item);
                 } else {
                     frame = new EmployeeJFrame();
                 }

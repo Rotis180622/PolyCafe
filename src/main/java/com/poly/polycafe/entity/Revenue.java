@@ -25,11 +25,11 @@ public class Revenue {
     @Builder
     public static class ByCategory {
         private String categoryName;
-        private float revenue;
         private int quantity;
-        private float minPrice;
-        private float maxPrice;
-        private float avgPrice;
+        private double revenue;
+        private double minPrice;
+        private double maxPrice;
+        private double avgPrice;
     }
 
      
@@ -38,8 +38,8 @@ public class Revenue {
     @Data
     @Builder
      public static class ByEmp {
-         private int employeeID;
          private String empName;
+         private double revenue;
          private int numOfBills;
          private LocalDateTime firstBill;
          private LocalDateTime recentBill;

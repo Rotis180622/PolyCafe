@@ -16,37 +16,73 @@ import java.util.List;
  * @author Gaudomun
  */
 public class RevenueDAOImpl implements RevenueDAO{
-    public static String revenueByCategorySql = """
-                                                  SELECT
-                                                  CAT.Name,
-                                                  SUM(BD.UnitPrice*(1-BD.Discount)*BD.Quantity) AS[Revenue],
-                                                  SUM(BD.Quantity) AS[Quantity],
-                                                  MIN(D.UnitPrice) AS[MinPrice],
-                                                  MAX(D.UnitPrice) AS[MaxPrice],
-                                                  AVG(D.UnitPrice) AS [AvgPrice]
-                                                  FROM Bills B
-                                                  JOIN BillDetails BD ON BD.BillId = B.Id
-                                                  JOIN DRINKS D ON D.Id = BD.DrinkId 
-                                                  JOIN Categories CAT ON CAT.Id = D.CategoryId
-                                                  GROUP BY CAT.Name
-                                                """;
-    public static String revenueByEmpSql = 
-            """
-            SELECT 
-                           
-                                           
-            """;
+    public static final String revenueByCategoryBase = """
+        SELECT
+            CAT.Name AS [CategoryName],
+            CAST(SUM(BD.UnitPrice * (1 - BD.Discount) * BD.Quantity) AS FLOAT) AS [Revenue],
+            SUM(BD.Quantity) AS [Quantity],
+            CAST(MIN(D.UnitPrice) AS FLOAT) AS [MinPrice],
+            CAST(MAX(D.UnitPrice) AS FLOAT) AS [MaxPrice],
+            CAST(AVG(D.UnitPrice) AS FLOAT) AS [AvgPrice]
+        FROM Bills B
+        JOIN BillDetails BD ON BD.BillId = B.Id
+        JOIN Drinks D ON D.Id = BD.DrinkId 
+        JOIN Categories CAT ON CAT.Id = D.CategoryId
+    """;
 
+    // Không lọc thời gian
+    public static final String revenueByCategorySql = 
+        revenueByCategoryBase + " GROUP BY CAT.Name";
 
+    // Lọc theo khoảng thời gian
+    public static final String revenueByCategorySortByTimeRange = 
+        revenueByCategoryBase + 
+        " WHERE B.Checkin BETWEEN ? AND ? " +
+        " GROUP BY CAT.Name";
+
+        public static final String revenueByEmpBase = """
+        SELECT 
+            U.Username AS [EmpName], 
+            COALESCE(CAST(SUM(BD.UnitPrice * BD.Quantity * (1 - BD.Discount)) AS FLOAT), 0) AS [Revenue], 
+            COUNT(DISTINCT BD.Id) AS [NumOfBills], 
+            MIN(B.Checkin) AS [FirstBill],
+            MAX(B.Checkin) AS [RecentBill]
+        FROM Users U
+        LEFT JOIN Bills B ON B.Username = U.Username
+        LEFT JOIN BillDetails BD ON BD.BillId = B.Id
+    """;
+
+    // Không lọc thời gian
+    public static final String revenueByEmpSql = 
+        revenueByEmpBase + 
+        " GROUP BY U.Username " +
+        " ORDER BY SUM(BD.UnitPrice * BD.Quantity * (1 - BD.Discount)) DESC";
+
+    // Lọc theo khoảng thời gian
+    public static final String revenueByEmpSortByTimeRange = 
+        revenueByEmpBase +
+        " WHERE B.Checkin BETWEEN ? AND ? " +
+        " GROUP BY U.Username " +
+        " ORDER BY SUM(BD.UnitPrice * BD.Quantity * (1 - BD.Discount)) DESC";
 
     @Override
-    public List<Revenue.ByCategory> revenueByCategory(LocalDateTime begin, LocalDateTime end) {
-        return XQuery.getBeanList(Revenue.ByCategory.class, revenueByCategorySql, begin, end);
+    public List<Revenue.ByCategory> revenueByCat_TimeRange(LocalDateTime begin, LocalDateTime end) {
+        return XQuery.getBeanList(Revenue.ByCategory.class, revenueByCategorySortByTimeRange, begin, end);
     }
 
     @Override
-    public List<Revenue.ByEmp> revenueByEmp(LocalDateTime begin, LocalDateTime end) {
-        return XQuery.getBeanList(Revenue.ByEmp.class, revenueByEmpSql, begin, end);
+    public List<Revenue.ByEmp> revenueByEmp_TimeRange(LocalDateTime begin, LocalDateTime end) {
+        return XQuery.getBeanList(Revenue.ByEmp.class, revenueByEmpSortByTimeRange, begin, end);
+    }
+
+    @Override
+    public List<Revenue.ByCategory> revenueByCategory() {
+        return XQuery.getBeanList(Revenue.ByCategory.class, revenueByCategorySql);
+    }
+
+    @Override
+    public List<Revenue.ByEmp> revenueByEmp() {
+        return XQuery.getBeanList(Revenue.ByEmp.class, revenueByEmpSql);
     }
     
 }

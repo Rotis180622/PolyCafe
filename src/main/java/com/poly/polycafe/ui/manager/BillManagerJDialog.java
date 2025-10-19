@@ -6,10 +6,14 @@ package com.poly.polycafe.ui.manager;
 
 import com.poly.polycafe.controller.BillManagerController;
 import com.poly.polycafe.dao.GenericDAO;
+import com.poly.polycafe.dao.BillDetailDAO;
+import com.poly.polycafe.daoimpl.BillDetailDAOImpl;
 import com.poly.polycafe.entity.BillDetails;
 import com.poly.polycafe.entity.Bills;
+import com.poly.polycafe.entity.Bill;
 import com.poly.polycafe.entity.Cards;
 import com.poly.polycafe.entity.Users;
+import com.poly.polycafe.entity.BillDetail;
 import com.poly.polycafe.utils.HibernateUtil;
 import com.poly.polycafe.utils.TimeRange;
 import java.time.LocalDateTime;
@@ -21,17 +25,21 @@ import java.util.Map;
 import java.util.Objects;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import lombok.*;
 import org.hibernate.Session;
 
 /**
  *
  * @author Gaudomun
  */
+@Setter
 public class BillManagerJDialog extends javax.swing.JDialog implements BillManagerController {
 
     /**
      * Creates new form BillManagerJDialog
      */
+    private Bill billl;
+            
     public BillManagerJDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
@@ -464,7 +472,11 @@ public class BillManagerJDialog extends javax.swing.JDialog implements BillManag
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
-        this.open();
+        if(billl != null) {
+            this.showBill();
+            this.showBillDetails(billl.getId());
+        }
+        else this.open();
     }//GEN-LAST:event_formWindowOpened
 
     private void tblBillsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblBillsMouseClicked
@@ -949,5 +961,47 @@ public class BillManagerJDialog extends javax.swing.JDialog implements BillManag
 
     }
 
+    public void showBill() {
+        tblBillModel = (DefaultTableModel) tblBills.getModel();
+        tblBillModel.setRowCount(0);
+        
+        Map<Integer, String> statusMap = new HashMap<>();
+       statusMap.put(0, "Canceled");
+       statusMap.put(1, "Completed");
+       statusMap.put(2, "Servicing");
+       String statusText= "";
+        
+        statusText= statusMap.get(billl.getStatus());
+        Object[] rowData = {
+            billl.getId(),
+            "Thẻ số #" + billl.getCardId(),
+            billl.getCheckin(),
+            billl.getCheckout()!=null ? billl.getCheckout(): "Chưa checkout",
+            statusText,
+            billl.getUsername()
+        };
+        tblBillModel.addRow(rowData);
+        
+    }
+    
+    public void showBillDetails(Long billId) {
+        tblDetailModel = (DefaultTableModel) tblDetail.getModel();
+        tblDetailModel.setRowCount(0);
+        
+        BillDetailDAO bdDao = new BillDetailDAOImpl();
+        List<BillDetail> bdList = bdDao.findAll();
+        for(BillDetail bd : bdList) {
+            if(Objects.equals(bd.getBillId(), billId)) {
+                Object[] rowData = {
+                  bd.getDrinkName(),
+                  bd.getUnitPrice(),
+                  bd.getDiscount(),
+                  bd.getQuantity(),
+                 (bd.getUnitPrice()*bd.getQuantity()*(1-bd.getDiscount()))
+                };
+                tblDetailModel.addRow(rowData);
+            }   
+        }
    
+    }
 }

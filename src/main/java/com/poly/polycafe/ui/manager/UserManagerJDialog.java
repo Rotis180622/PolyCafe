@@ -9,9 +9,14 @@ import com.poly.polycafe.dao.GenericDAO;
 import com.poly.polycafe.entity.Users;
 import com.poly.polycafe.utils.XDialog;
 import com.poly.polycafe.utils.XFile;
+import java.awt.Image;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -528,6 +533,7 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
         this.setLocationRelativeTo(null);
         this.fillToTable();
         this.clear();
+        this.chooseProfile();
     }
 
     @Override
@@ -596,7 +602,7 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
         } else {
             rdoEmployee.setSelected(true);
         }
-        lblProfile.setIcon(new ImageIcon(this.getClass().getResource("/icons/" + entity.getPhoto())));
+       
     }
 
     @Override
@@ -610,6 +616,9 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
 
         if(rdoManager.isSelected()) entity.setManager(true);
         else entity.setManager(false);
+        String imagePath = (String)lblProfile.getClientProperty("imagePath");
+        String photoName = imagePath.substring(imagePath.lastIndexOf("\\")).replace("\\", "");
+        entity.setPhoto(photoName);
         return entity;
     }
 
@@ -746,4 +755,38 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
 
             XFile.exportFile(this, title, header, fileName, listObj);
     }
+    
+   public void chooseProfile() {
+       lblProfile.setText("Nhấn để chọn ảnh");
+       lblProfile.addMouseListener(new MouseAdapter() {
+           @Override
+           public void mouseClicked(MouseEvent e) {
+               JFileChooser fileChooser = new JFileChooser();
+               fileChooser.setDialogTitle("Chọn hình ảnh");
+               fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter(""
+                       + "Ảnh (*.jpg, *.jpeg, *.png)", "jpg", "jpeg", "png"));
+               
+               int result = fileChooser.showOpenDialog(null);
+               
+               if(result == JFileChooser.APPROVE_OPTION) {
+                   File selectedFile = fileChooser.getSelectedFile();
+                   String path = selectedFile.getAbsolutePath();
+                   System.out.println(path);
+                   ImageIcon image = new ImageIcon(path);
+                   lblProfile.setText("");
+                   lblProfile.setIcon(getScaledIcon(image));
+                   lblProfile.putClientProperty("imagePath", path);
+                   
+                   String imagePath = (String)lblProfile.getClientProperty("imagePath");
+                   String photoName = imagePath.substring(imagePath.lastIndexOf("\\")).replace("\\", "");;
+                   System.out.println(photoName);
+               }
+           }
+       });    
+   }
+   
+   public ImageIcon getScaledIcon(ImageIcon icon) {
+       Image image = icon.getImage().getScaledInstance(lblProfile.getWidth(), lblProfile.getHeight(), java.awt.Image.SCALE_SMOOTH);
+       return new ImageIcon(image);
+   }
 }

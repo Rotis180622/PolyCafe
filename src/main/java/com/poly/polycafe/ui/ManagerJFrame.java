@@ -4,17 +4,25 @@
  */
 package com.poly.polycafe.ui;
 
+import com.poly.polycafe.entity.User;
 import com.poly.polycafe.ui.manager.BillManagerJDialog;
 import com.poly.polycafe.ui.manager.CardManagerJDialog;
 import com.poly.polycafe.ui.manager.CategoryManagerJDialog;
 import com.poly.polycafe.ui.manager.DrinkManagerJDialog;
+import com.poly.polycafe.ui.manager.RevenueManagerJDialog;
 import com.poly.polycafe.ui.manager.UserManagerJDialog;
+import javax.swing.ImageIcon;
+import javax.swing.JDialog;
+import lombok.*;
 /**
  *
  * @author Gaudomun
  */
+@Getter @Setter
 public class ManagerJFrame extends javax.swing.JFrame {
-
+    private JDialog historyDialog;
+    private User user;
+    
     /**
      * Creates new form MainUi
      */
@@ -56,6 +64,11 @@ public class ManagerJFrame extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("POLYCAFE");
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowOpened(java.awt.event.WindowEvent evt) {
+                formWindowOpened(evt);
+            }
+        });
         getContentPane().setLayout(new java.awt.BorderLayout(5, 0));
 
         jPanel1.setPreferredSize(new java.awt.Dimension(300, 300));
@@ -64,9 +77,19 @@ public class ManagerJFrame extends javax.swing.JFrame {
         pnlButtons.setLayout(new java.awt.GridLayout(2, 2, 5, 5));
 
         btnSales.setText("BÁN HÀNG");
+        btnSales.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSalesActionPerformed(evt);
+            }
+        });
         pnlButtons.add(btnSales);
 
         btnHistory.setText("LỊCH SỬ");
+        btnHistory.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnHistoryActionPerformed(evt);
+            }
+        });
         pnlButtons.add(btnHistory);
 
         btnChangePassword.setText("ĐỔI MẬT KHẨU");
@@ -87,12 +110,10 @@ public class ManagerJFrame extends javax.swing.JFrame {
 
         jPanel1.add(pnlButtons, java.awt.BorderLayout.PAGE_END);
 
-        lblProfile.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/trump-small.png"))); // NOI18N
         lblProfile.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 51, 51)));
 
         lblUserName.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         lblUserName.setForeground(new java.awt.Color(0, 51, 255));
-        lblUserName.setText("Nguyễn Văn Admin");
         lblUserName.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 102, 0)));
 
         javax.swing.GroupLayout pnlProfileLayout = new javax.swing.GroupLayout(pnlProfile);
@@ -169,6 +190,11 @@ public class ManagerJFrame extends javax.swing.JFrame {
         pnlControlButtons.add(btnUserMgr);
 
         btnRevenueMgr.setText("DOANH THU");
+        btnRevenueMgr.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRevenueMgrActionPerformed(evt);
+            }
+        });
         pnlControlButtons.add(btnRevenueMgr);
 
         pnlControl.add(pnlControlButtons, java.awt.BorderLayout.PAGE_END);
@@ -247,6 +273,26 @@ public class ManagerJFrame extends javax.swing.JFrame {
         billMgr.setVisible(true);
     }//GEN-LAST:event_btnBillMgrActionPerformed
 
+    private void btnRevenueMgrActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRevenueMgrActionPerformed
+        RevenueManagerJDialog revenueDialog = new RevenueManagerJDialog(new javax.swing.JFrame(), true);
+        revenueDialog.setVisible(true);
+    }//GEN-LAST:event_btnRevenueMgrActionPerformed
+
+    private void btnHistoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHistoryActionPerformed
+        historyDialog.setVisible(true);
+    }//GEN-LAST:event_btnHistoryActionPerformed
+
+    private void btnSalesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalesActionPerformed
+        SalesJDialog sales = new SalesJDialog(this, true);
+        sales.setUser(user);
+        sales.setVisible(true);
+ 
+    }//GEN-LAST:event_btnSalesActionPerformed
+
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
+        this.showUserInfo();
+    }//GEN-LAST:event_formWindowOpened
+
     /**
      * @param args the command line arguments
      */
@@ -306,4 +352,9 @@ public class ManagerJFrame extends javax.swing.JFrame {
     private javax.swing.JPanel pnlControlButtons;
     private javax.swing.JPanel pnlProfile;
     // End of variables declaration//GEN-END:variables
+    
+    public void showUserInfo() {
+        lblUserName.setText(user.getUsername());
+        lblProfile.setIcon(new ImageIcon(getClass().getResource("/images/" + user.getPhoto())));
+    }
 }

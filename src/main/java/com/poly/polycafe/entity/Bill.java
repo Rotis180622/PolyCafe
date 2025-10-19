@@ -1,10 +1,12 @@
 package com.poly.polycafe.entity;
 
 import java.util.Date;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.sql.Timestamp;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,8 +17,9 @@ public class Bill {
     private String username;
     private Integer cardId;
     @Builder.Default
-    private Date checkin = new Date();
-    private Date checkout;
+    private Timestamp checkin = new Timestamp(System.currentTimeMillis());
+    @Builder.Default
+    private  Timestamp checkout = new Timestamp(System.currentTimeMillis());
     private int status;
     
     public enum Status {

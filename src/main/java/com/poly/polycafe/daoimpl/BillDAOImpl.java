@@ -6,6 +6,7 @@ import com.poly.polycafe.utils.XAuth;
 import com.poly.polycafe.utils.XJdbc;
 import com.poly.polycafe.utils.XQuery;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -22,7 +23,7 @@ public class BillDAOImpl implements BillDAO {
     private final String findLastSql = findAllSql + " WHERE Id IN(SELECT max(Id) FROM Bills)";
     private final String findByUsernameSql = findAllSql + " WHERE Username=?";
     private final String findByCardIdSql = findAllSql + " WHERE CardId=?";
-    private final String findServicingByCardIdSql = findAllSql + " WHERE CardId=? AND Status=0";
+    private final String findServicingByCardIdSql = findAllSql + " WHERE CardId=? AND Status=1";
     private final String findByUsernameAndTimeRangeSql = findAllSql + " WHERE Username=? AND Checkin BETWEEN ? AND ? ORDER BY Checkin DESC";
     private final String findByTimeRangeSql = findAllSql + " WHERE Checkin BETWEEN ? AND ? ORDER BY Checkin DESC";
 
@@ -95,7 +96,7 @@ public class BillDAOImpl implements BillDAO {
             if (bill == null) {
                 Bill newBill = new Bill();
                 newBill.setCardId(cardId);
-                newBill.setCheckin(new Date());
+                newBill.setCheckin(new Timestamp(System.currentTimeMillis()));
                 newBill.setStatus(0);
                 newBill.setUsername(XAuth.user.getUsername());
                 bill = this.create(newBill);

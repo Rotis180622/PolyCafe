@@ -6,9 +6,7 @@ package com.poly.polycafe.dao;
 
 
 import com.poly.polycafe.entity.Revenue;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -16,19 +14,9 @@ import java.util.List;
  * @author Gaudomun
  */
 public interface RevenueDAO {
-    /**
-     * Truy vấn doanh thu theo loại sách
-     * @param begin
-     * @param end
-     * @return 
-     */
-    List<Revenue.ByCategory>revenueByCategory(LocalDateTime begin, LocalDateTime end);
-    
-    /**
-     * Truy vấn doanh thu theo nhân viên
-     * @param begin
-     * @param end
-     * @return 
-     */
-    List<Revenue.ByEmp>revenueByEmp(LocalDateTime begin, LocalDateTime end);
+    List<Revenue.ByCategory>revenueByCategory();
+    List<Revenue.ByCategory> revenueByCat_TimeRange(LocalDateTime begin, LocalDateTime end);
+   
+    List<Revenue.ByEmp> revenueByEmp();
+    List<Revenue.ByEmp> revenueByEmp_TimeRange(LocalDateTime begin, LocalDateTime end);
 }
